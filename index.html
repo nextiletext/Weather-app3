@@ -2,19 +2,31 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Weather App</title>
-    <!-- Tailwind CSS CDN for styling -->
+
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        
+        /* Ensure html and body take up full viewport height with zero offsets */
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            min-height: 100%;
+        }
+
         body {
             font-family: 'Inter', sans-serif;
         }
     </style>
 </head>
-<body class="min-h-screen bg-gradient-to-br from-blue-400 to-indigo-600 p-4 flex items-center justify-center">
-    <div id="root"></div>
+<body class="min-h-screen min-h-[100dvh] w-full bg-gradient-to-br from-blue-400 to-indigo-600 p-4 flex items-center justify-center">
+    <div id="root" class="w-full flex justify-center items-center"></div>
 
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -25,8 +37,8 @@
         const BASE_URL = "https://api.openweathermap.org/data/2.5/weather";
 
         const SECRET_REDIRECTS = {
-            'Nextile': 'https://guns.lol/nextile',
-            'nextile': 'https://guns.lol/nextile'
+            'nextile': 'https://guns.lol/nextile',
+            'socials': 'https://guns.lol/nextile'
         };
 
         const { useState } = React;
@@ -37,7 +49,6 @@
             const [isLoading, setIsLoading] = useState(false);
             const [error, setError] = useState(null);
 
-            // Fetch weather using city name
             const handleFormSubmit = async (e) => {
                 e.preventDefault();
                 const trimmedInput = city.trim().toLowerCase();
@@ -57,7 +68,6 @@
                 fetchWeatherByUrl(`${BASE_URL}?q=${encodeURIComponent(city)}&appid=${API_KEY}&units=metric`);
             };
 
-            // Fetch weather using GPS coordinates
             const handleLocationSearch = () => {
                 if (!navigator.geolocation) {
                     setError('Geolocation is not supported by your browser.');
@@ -79,7 +89,6 @@
                 );
             };
 
-            // Common fetch logic
             const fetchWeatherByUrl = async (url) => {
                 setIsLoading(true);
                 setError(null);
@@ -126,9 +135,9 @@
             };
 
             return (
-                <div className="w-full max-w-xl bg-white rounded-3xl shadow-2xl p-8 transform transition-all hover:scale-105 duration-300">
-                    <h1 className="text-4xl font-bold text-center text-gray-800 mb-2">Weather App</h1>
-                    <p className="text-center text-gray-500 mb-8">
+                <div className="w-full max-w-xl bg-white rounded-3xl shadow-2xl p-6 sm:p-8 transform transition-all duration-300">
+                    <h1 className="text-3xl sm:text-4xl font-bold text-center text-gray-800 mb-2">Weather App</h1>
+                    <p className="text-center text-gray-500 mb-8 text-sm sm:text-base">
                         Enter a city or use your location to get current weather.
                     </p>
                     
@@ -138,20 +147,20 @@
                             value={city}
                             onChange={(e) => setCity(e.target.value)}
                             placeholder="Enter city name..."
-                            className="flex-grow p-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                            className="flex-grow p-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-sm sm:text-base min-w-0"
                         />
                         <button
                             type="button"
                             onClick={handleLocationSearch}
                             title="Use My Location"
-                            className="p-3 bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300 rounded-xl shadow-sm transition-colors duration-200 flex items-center justify-center"
+                            className="p-3 bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300 rounded-xl shadow-sm transition-colors duration-200 flex items-center justify-center flex-shrink-0"
                             disabled={isLoading}
                         >
                             {icons.location}
                         </button>
                         <button
                             type="submit"
-                            className="p-3 bg-blue-600 text-white rounded-xl shadow-md hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center"
+                            className="p-3 bg-blue-600 text-white rounded-xl shadow-md hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center flex-shrink-0"
                             disabled={isLoading}
                         >
                             {isLoading ? (
@@ -169,13 +178,13 @@
                         {error && (
                             <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl relative flex items-center gap-2" role="alert">
                                 {icons.alert}
-                                <span className="block sm:inline">{error}</span>
+                                <span className="block sm:inline text-sm sm:text-base">{error}</span>
                             </div>
                         )}
 
                         {weatherData && (
                             <div className="text-center">
-                                <h2 className="text-3xl font-semibold text-gray-800 mb-4">
+                                <h2 className="text-2xl sm:text-3xl font-semibold text-gray-800 mb-4">
                                     {weatherData.name}, {weatherData.sys.country}
                                 </h2>
                                 
