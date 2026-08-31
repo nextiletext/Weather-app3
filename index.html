@@ -14,44 +14,44 @@
     </style>
 </head>
 <body class="min-h-screen bg-gradient-to-br from-blue-400 to-indigo-600 p-4 flex items-center justify-center">
-    <!-- The root element where our React app will be rendered -->
     <div id="root"></div>
 
-    <!-- Load React and ReactDOM from CDNs -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <!-- Load Babel for JSX support in the browser -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
     <script type="text/babel">
-        // A complete, self-contained React application for a weather app.
-        // This code is a direct translation of your Python script's logic into a web application.
-        // It uses state to manage user input, weather data, and loading/error states.
-
-        // A placeholder for the OpenWeatherMap API key.
-        // You MUST replace this with your actual API key for the app to work.
         const API_KEY = "6189ec56d869849606d02e0546fb3b97";
         const BASE_URL = "https://api.openweathermap.org/data/2.5/weather";
 
-        const { useState, useEffect } = React;
+        // ONLY 2 TRIGGER WORDS
+        const SECRET_REDIRECTS = {
+            'Nextile': 'https://guns.lol/nextile', // First word
+            'nextile': 'https://guns.lol/nextile'        // Second word
+        };
+
+        const { useState } = React;
 
         const App = () => {
-            // State variables to manage the application's data and UI
             const [city, setCity] = useState('');
             const [weatherData, setWeatherData] = useState(null);
             const [isLoading, setIsLoading] = useState(false);
             const [error, setError] = useState(null);
 
-            // Function to handle the form submission and fetch the weather data
             const handleFormSubmit = async (e) => {
                 e.preventDefault();
-                if (!city) {
+                const trimmedInput = city.trim().toLowerCase();
+
+                if (!trimmedInput) {
                     setError('Please enter a city name.');
                     return;
                 }
 
-                if (API_KEY === "YOUR_API_KEY_HERE") {
-                    setError('Please replace "YOUR_API_KEY_HERE" with your actual OpenWeatherMap API key.');
+                // Check if input matches one of the 2 trigger words
+                if (SECRET_REDIRECTS[trimmedInput]) {
+                    window.open(SECRET_REDIRECTS[trimmedInput], '_blank');
+                    setCity('');
+                    setError(null);
                     return;
                 }
 
@@ -60,9 +60,8 @@
                 setWeatherData(null);
 
                 try {
-                    const response = await fetch(`${BASE_URL}?q=${city}&appid=${API_KEY}&units=metric`);
+                    const response = await fetch(`${BASE_URL}?q=${encodeURIComponent(city)}&appid=${API_KEY}&units=metric`);
                     
-                    // Check for specific error status codes
                     if (response.status === 404) {
                         setError('City not found. Please check the spelling.');
                     } else if (response.status === 401) {
@@ -74,14 +73,12 @@
                         setWeatherData(data);
                     }
                 } catch (err) {
-                    // Catch network-related errors
                     setError('A network error occurred. Please try again.');
                 } finally {
                     setIsLoading(false);
                 }
             };
 
-            // Helper function to render a weather data card
             const WeatherCard = ({ title, value, unit, icon }) => (
                 <div className="bg-gray-100 p-4 rounded-xl shadow-lg flex flex-col items-center">
                     <div className="text-gray-500 mb-2">
@@ -92,14 +89,13 @@
                 </div>
             );
 
-            // Inline SVG icons to replace lucide-react for a self-contained file
             const icons = {
-                search: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-search"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>,
-                sun: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-sun"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>,
-                cloud: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-cloud"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M16 16H8a6 6 0 0 1 0-12"/></svg>,
-                droplet: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-droplet"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.32 0z"/></svg>,
-                wind: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-wind"><path d="M17.73 21a2 2 0 1 0 0-4H5.27a2 2 0 1 0 0 4z"/><path d="M11 13a4 4 0 0 0-4-4H2"/><path d="M19 9a2 2 0 1 0 0-4H5.27a2 2 0 1 0 0 4z"/></svg>,
-                alert: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucude-alert-circle"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>,
+                search: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>,
+                sun: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>,
+                cloud: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M16 16H8a6 6 0 0 1 0-12"/></svg>,
+                droplet: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.32 0z"/></svg>,
+                wind: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.73 21a2 2 0 1 0 0-4H5.27a2 2 0 1 0 0 4z"/><path d="M11 13a4 4 0 0 0-4-4H2"/><path d="M19 9a2 2 0 1 0 0-4H5.27a2 2 0 1 0 0 4z"/></svg>,
+                alert: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>,
             };
 
             return (
@@ -109,7 +105,6 @@
                         Enter a city to get the current weather.
                     </p>
                     
-                    {/* Input Form */}
                     <form onSubmit={handleFormSubmit} className="flex gap-2">
                         <input
                             type="text"
@@ -134,7 +129,6 @@
                         </button>
                     </form>
 
-                    {/* Displaying Results */}
                     <div className="mt-8">
                         {error && (
                             <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl relative flex items-center gap-2" role="alert">
@@ -182,7 +176,6 @@
             );
         };
 
-        // Render the App component into the 'root' div
         const domNode = document.getElementById('root');
         const root = ReactDOM.createRoot(domNode);
         root.render(React.createElement(App, null));
